@@ -1,12 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import AdminAmbulance from '../components/AdminAmbulance';
+import { useNavigate } from 'react-router-dom';
+import AdminHospital from '../components/AdminHospital';
+import AdminTraffic from '../components/AdminTraffic';
 
 const AdminDashboard = () => {
   const { userInfo } = useSelector((state) => state.auth);
+  const navigate = useNavigate()
 
   const [isAmbulanceClicked, setIsAmbulanceClicked] = useState(false);
   const [isHospitalClicked, setIsHospitalClicked] = useState(false);
   const [isTrafficClicked, setIsTrafficClicked] = useState(false);
+  useEffect(() => {
+    if(!userInfo){
+      navigate("/login")
+    }else{
+      setIsAmbulanceClicked(true);
+      setIsHospitalClicked(false);
+      setIsTrafficClicked(false);
+    }
+  },[])
 
   const ambulanceClickHandler = (e) => {
     e.preventDefault();
@@ -56,11 +70,22 @@ const AdminDashboard = () => {
         </div>
 
         {/* Main content */}
+        <div className='ml-80 mt-10'>
         {
-          isAmbulanceClicked &&<div>
-            
-          </div>
+          isAmbulanceClicked &&<>
+            <AdminAmbulance userInfo = {userInfo}/>
+          </>
         }
+        {isHospitalClicked && <>
+          <AdminHospital userInfo={userInfo}/>
+        </>}
+        {
+          isTrafficClicked&&<>
+            <AdminTraffic userInfo = {userInfo} />
+          </>
+        }
+        </div>
+       
       </div>
     </div>
   );

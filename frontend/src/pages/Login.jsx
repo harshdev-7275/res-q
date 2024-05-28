@@ -33,8 +33,7 @@ const Login = () => {
         }
         try {
             const res = await login({email, password}).unwrap();
-       
-            
+
                 console.log(res);
                 // const data = res.data
                 dispatch(setCredentials({ ...res }));
