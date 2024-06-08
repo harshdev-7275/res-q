@@ -40,3 +40,12 @@
 .read-the-docs {
   color: #888;
 }
+/* Add this to your CSS file */
+.hospital-marker {
+  color: white;
+  background-color: red;
+  padding: 10px;
+  border-radius: 50%;
+  text-align: center;
+  font-weight: bold;
+}

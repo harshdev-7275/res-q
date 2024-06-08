@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "@mapbox/mapbox-sdk": "^0.16.0",
+    "leaflet": "^1.9.4",
+    "map-my-india-react-new-version": "^1.2.4",
+    "mapbox-gl": "^3.4.0",
+    "mapmyindia-react": "^1.0.6",
+    "mapmyindia-sdk-nodejs": "^1.1.0",
+    "mappls-web-maps": "^3.0.4",
+    "react-leaflet": "^4.2.1",
+    "react-map-gl": "^7.1.7",
+    "react-select": "^5.8.0",
+    "react-toastify": "^10.0.5"
+  }
+}
