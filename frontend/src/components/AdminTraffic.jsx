@@ -12,7 +12,7 @@ const AdminTraffic = ({userInfo}) => {
 
     const getAllTraffic = async () => {
         try {
-          const res = await axios.get(`http://localhost:5000/api/admin/get-all-traffic`, {
+          const res = await axios.get(`http://localhost:5005/api/admin/get-all-traffic`, {
             withCredentials: true,
           });
           setTraffic(res.data.data);

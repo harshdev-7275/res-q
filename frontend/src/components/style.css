@@ -1,0 +1,40 @@
+.notifications-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  .notifications-table th, .notifications-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .notifications-table th {
+    background-color: #f2f2f2;
+  }
+  
+  .notifications-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  .notifications-table tr:hover {
+    background-color: #ddd;
+  }
+  
+  .accept-btn, .decline-btn {
+    padding: 6px 10px;
+    margin-right: 5px;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+  }
+  
+  .accept-btn {
+    background-color: #4CAF50;
+  }
+  
+  .decline-btn {
+    background-color: #f44336;
+  }
+  

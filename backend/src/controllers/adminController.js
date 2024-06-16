@@ -194,7 +194,7 @@ const deleteAmbulance = async (req, res) => {
 
 const createHospital = async (req, res) => {
   try {
-    const { email, name, password, phoneNumber, location } = req.body;
+    const { email, name, password, phoneNumber, location,lat,lng } = req.body;
     if (!email || !name || !password || !location || !phoneNumber) {
       return res.status(400).json({
         success: false,
@@ -222,6 +222,8 @@ const createHospital = async (req, res) => {
           create: {
             phoneNumber,
             location,
+            lat,
+            lng
           },
         },
       },
@@ -538,6 +540,77 @@ const deleteTraffic = async (req, res) => {
     });
   }
 };
+const createNotification = async (req, res) => {
+  const { Tolat, Tolng, Bylat, Bylng } = req.body.selectedHospital;
+  console.log(req.body.selectedHospital);
+  try {
+    const notification = await prisma.notification.create({
+      data: {
+        Bylat,
+        Bylng,
+        Tolat,
+        Tolng
+      }
+    });
+    res.status(201).json(notification);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: error.message });
+  }
+};
+const getNotifications = async (req, res) => {
+  const { lat, lng } = req.body;
+  console.log(lat,lng);
+ const Tolat = lat;
+ const Tolng = lng;
+
+  try {
+    const notifications = await prisma.notification.findMany({
+      where: {
+        Tolat,
+        Tolng
+      }
+    });
+    res.status(200).json(notifications);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+const changeNotificationStatus = async (req, res) => {
+  const { id, status } = req.body;
+
+  try {
+    const notification = await prisma.notification.update({
+      where: { id: id },
+      data: { status }, 
+    });
+    res.status(200).json(notification);
+  } catch (error) {
+    console.error('Error updating notification status:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+const getNotificationStatus = async (req, res) => {
+  const { Tolat, Tolng } = req.body;
+  console.log(req.body,Tolat, Tolng);
+  try {
+    const notification = await prisma.notification.findFirst({
+      where: {
+        Tolat: parseFloat(Tolat),
+        Tolng: parseFloat(Tolng),
+      },
+    });
+
+    if (notification) {
+      res.status(200).json({ status: notification.status });
+    } else {
+      res.status(404).json({ error: 'Notification not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching notification status:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
 export {
   createAdmin,
@@ -553,4 +626,8 @@ export {
   getAllTraffic,
   updateTraffic,
   deleteTraffic,
+  createNotification,
+  getNotifications,
+  changeNotificationStatus,
+  getNotificationStatus
 };
