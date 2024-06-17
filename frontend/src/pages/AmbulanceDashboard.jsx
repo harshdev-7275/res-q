@@ -173,68 +173,40 @@
 // export default AmbulanceDashboard;
 
 
-
-import React, { useState, useEffect } from "react";
+// AmbulanceDashboard.jsx
+import React, { useState } from "react";
 import Select from "react-select";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 const areas = [
   { value: "ADUGODI", label: "ADUGODI" },
   { value: "AIRPORT", label: "AIRPORT" },
   // Add other areas...
 ];
+
 const AmbulanceDashboard = () => {
   const [area, setArea] = useState(null);
-  const [notifications, setNotifications] = useState([]);
-
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
-
-  const fetchNotifications = async () => {
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/ambulance/notifications"
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch notifications");
-      }
-      const data = await response.json();
-      setNotifications(data);
-    } catch (error) {
-      // console.error(error);
-      toast.error("Failed to fetch notifications");
-    }
-  };
+  const [message, setMessage] = useState("");
 
   const handleNotification = async () => {
     if (area) {
       try {
-        const response = await fetch("/api/notify", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            area: area.value,
-            message: `Notification for area ${area.label}`,
-          }),
+        await axios.post("http://localhost:5000/api/send-notification", {
+          area: area.value,
+          message: message,
         });
-
-        if (response.ok) {
-          toast.info(`Notification sent to traffic profiles in ${area.label}`);
-        } else {
-          toast.error("Failed to send notification");
-        }
+        alert("Notification sent successfully.");
       } catch (error) {
-        toast.error("An error occurred");
+        console.error("Error sending notification:", error);
+        alert("Failed to send notification.");
       }
+    } else {
+      alert("Please select an area.");
     }
   };
 
   return (
-    <div className="mb-4">
+    <div className="mb-4 p-4 bg-white shadow-md rounded-md">
       <label className="block text-gray-700 mb-1">Area</label>
       <Select
         options={areas}
@@ -242,24 +214,21 @@ const AmbulanceDashboard = () => {
         placeholder="Select an area"
         value={area}
         isSearchable
+        className="mb-4"
+      />
+      <input
+        type="text"
+        placeholder="Enter message"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        className="mb-4 p-2 border rounded w-full"
       />
       <button
         onClick={handleNotification}
-        className="ml-2 p-2 bg-blue-500 text-white rounded"
+        className="p-2 bg-blue-500 text-white rounded"
       >
         Notify
       </button>
-
-      <div>
-        <h2>Notifications Status</h2>
-        {notifications.map((notification) => (
-          <div key={notification.id} className="notification-status">
-            <p>
-              {notification.message} - {notification.status}
-            </p>
-          </div>
-        ))}
-      </div>
     </div>
   );
 };
