@@ -24,7 +24,9 @@ const loginUser = async(req, res)=>{
             id : userExists.id,
             email : userExists.email,
             name:userExists.name,
-            role : userExists.role
+            role : userExists.role,
+            lat:userExists?.lat,
+            lng:userExists.lng
         })
     } catch (error) {
         console.error(error);

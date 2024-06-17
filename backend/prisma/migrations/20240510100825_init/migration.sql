@@ -74,3 +74,6 @@ ALTER TABLE "HospitalProfile" ADD CONSTRAINT "HospitalProfile_userId_fkey" FOREI
 
 -- AddForeignKey
 ALTER TABLE "TrafficProfile" ADD CONSTRAINT "TrafficProfile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+

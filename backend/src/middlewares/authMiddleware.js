@@ -13,8 +13,8 @@ export const isAuth = async (req, res, next) => {
   }
   console.log(token);
   try {
-    console.log(process.env.JWT_SECRET);
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // console.log(process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, "wada@342");
     console.log(decoded);
     req.user = await prisma.user.findUnique({
       where: {

@@ -11,7 +11,7 @@ const AdminAmbulance = ({ userInfo }) => {
 
   const getAllAmbulance = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/admin/get-all-ambulance`, {
+      const res = await axios.get(`http://localhost:5005/api/admin/get-all-ambulance`, {
         withCredentials: true,
       });
       setAmbulances(res.data.data);

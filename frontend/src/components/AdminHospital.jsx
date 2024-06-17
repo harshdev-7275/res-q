@@ -12,7 +12,7 @@ const AdminHospital = () => {
 
     const getAllHospital = async () => {
         try {
-          const res = await axios.get(`http://localhost:5000/api/admin/get-all-hospital`, {
+          const res = await axios.get(`http://localhost:5005/api/admin/get-all-hospital`, {
             withCredentials: true,
           });
           setHospital(res.data.data);
