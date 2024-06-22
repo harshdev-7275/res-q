@@ -8,3 +8,5 @@ buttonColor = #54399b
 DATABASE_URL="postgresql://postgres:password@localhost:5432/resq?schema=public"
 PORT=5000
 JWT_SECRET=wada@342
+
+pk.eyJ1Ijoic2h1Ymg5NDYyNyIsImEiOiJjbHd0bGtrbTYwNWlrMmxzZ3Y1Y3Nwa20wIn0.xJTRixHgpG1bCGt_3IASew

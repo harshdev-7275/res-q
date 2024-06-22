@@ -1,32 +1,56 @@
-
 import React, { useState } from "react";
 import { adminApi } from "../helper/api";
+import Select from "react-select";
 import axios from "axios";
 
-const EditTraffic = ({traffic}) => {
-    const [isEdit, setIsEdit] = useState(false);
+const EditTraffic = ({ traffic }) => {
+  const [isEdit, setIsEdit] = useState(false);
   const [email, setEmail] = useState(traffic.email);
   const [name, setName] = useState(traffic.name);
-  const [phoneNumber, setPhoneNumber] = useState(traffic.trafficProfile.phoneNumber);
+  const [phoneNumber, setPhoneNumber] = useState(
+    traffic.trafficProfile.phoneNumber
+  );
   const [location, setLocation] = useState(traffic.trafficProfile.location);
   const [status, setStatus] = useState(traffic.trafficProfile.status);
+  const [area, setArea] = useState({
+    value: traffic.trafficProfile.area,
+  });
 
+  const areas = [
+    { value: "ADUGODI", label: "ADUGODI" },
+    { value: "AIRPORT", label: "AIRPORT" },
+    { value: "ASHOK NAGAR", label: "ASHOK NAGAR" },
+    { value: "BANSHANKARI", label: "BANSHANKARI" },
+    { value: "BANASVADI", label: "BANASVADI" },
+    { value: "BASAVANAGUDI", label: "BASAVANAGUDI" },
+    { value: "BYATARAYANAPURA", label: "BYATARAYANAPURA" },
+    { value: "CENTRAL", label: "CENTRAL" },
+    { value: "CHIKKAJAALA", label: "CHIKKAJAALA" },
+    { value: "CHIKKAPET", label: "CHIKKAPET" },
+    { value: "CUBBON PARK", label: "CUBBON PARK" },
+    { value: "DEVANAHALLI", label: "DEVANAHALLI" },
+    { value: "ELECTRONIC CITY", label: "ELECTRONIC CITY" },
+  ];
 
   const handleSave = async () => {
-    if (!name || !email || !phoneNumber || !location) {
+    if (!name || !email || !phoneNumber || !location || !area) {
       alert("Please fill all the fields");
       return;
     }
     try {
-      const res = await axios.put(`${adminApi}/update-traffic-byId/${traffic.id}`, {
-        name,
-        email,
-        trafficProfile: {
-          phoneNumber,
-          location,
-          status: Boolean(status), // Ensure status is a boolean
-        },
-      });
+      const res = await axios.put(
+        `${adminApi}/update-traffic-byId/${traffic.id}`,
+        {
+          name,
+          email,
+          trafficProfile: {
+            phoneNumber,
+            location,
+            status: Boolean(status),
+            area: area.value,
+          },
+        }
+      );
       alert("Traffic updated successfully");
     } catch (error) {
       console.log(error);
@@ -38,11 +62,14 @@ const EditTraffic = ({traffic}) => {
     }, 500);
   };
 
-
   const handleDelete = async () => {
-    if (window.confirm("Are you sure you want to delete this traffic police?")) {
+    if (
+      window.confirm("Are you sure you want to delete this traffic police?")
+    ) {
       try {
-        const res = await axios.delete(`${adminApi}/delete-traffic-byId/${traffic.id}`);
+        const res = await axios.delete(
+          `${adminApi}/delete-traffic-byId/${traffic.id}`
+        );
         alert("Traffic deleted successfully");
         window.location.reload();
       } catch (error) {
@@ -59,10 +86,16 @@ const EditTraffic = ({traffic}) => {
         <p>{traffic.email}</p>
       </div>
       <div className="flex items-center gap-3">
-        <button className="bg-white px-2 py-1 rounded-md" onClick={() => setIsEdit(true)}>
+        <button
+          className="bg-white px-2 py-1 rounded-md"
+          onClick={() => setIsEdit(true)}
+        >
           Edit
         </button>
-        <button className="bg-red-500 text-white px-2 py-1 rounded-md" onClick={handleDelete}>
+        <button
+          className="bg-red-500 text-white px-2 py-1 rounded-md"
+          onClick={handleDelete}
+        >
           Delete
         </button>
       </div>
@@ -71,7 +104,9 @@ const EditTraffic = ({traffic}) => {
           <div className="bg-white p-5 rounded-md shadow-md max-w-sm w-full transform transition-transform scale-95 animate-slide-up">
             <h2 className="text-lg font-bold mb-4">Edit Traffic Police</h2>
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2" htmlFor="name">Name</label>
+              <label className="block text-gray-700 mb-2" htmlFor="name">
+                Name
+              </label>
               <input
                 type="text"
                 id="name"
@@ -82,7 +117,9 @@ const EditTraffic = ({traffic}) => {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2" htmlFor="email">Email</label>
+              <label className="block text-gray-700 mb-2" htmlFor="email">
+                Email
+              </label>
               <input
                 type="email"
                 id="email"
@@ -93,7 +130,9 @@ const EditTraffic = ({traffic}) => {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2" htmlFor="phoneNumber">Phone Number</label>
+              <label className="block text-gray-700 mb-2" htmlFor="phoneNumber">
+                Phone Number
+              </label>
               <input
                 type="text"
                 id="phoneNumber"
@@ -104,7 +143,9 @@ const EditTraffic = ({traffic}) => {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2" htmlFor="location">Location</label>
+              <label className="block text-gray-700 mb-2" htmlFor="location">
+                Location
+              </label>
               <input
                 type="text"
                 id="location"
@@ -115,7 +156,9 @@ const EditTraffic = ({traffic}) => {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2" htmlFor="status">Status</label>
+              <label className="block text-gray-700 mb-2" htmlFor="status">
+                Status
+              </label>
               <input
                 type="checkbox"
                 id="status"
@@ -125,11 +168,27 @@ const EditTraffic = ({traffic}) => {
               />
               Active
             </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-1">Area</label>
+              <Select
+                options={areas}
+                onChange={(selectedOption) => setArea(selectedOption)}
+                placeholder="Select an area"
+                value={area}
+                isSearchable
+              />
+            </div>
             <div className="flex justify-end gap-3">
-              <button className="bg-gray-500 text-white px-3 py-2 rounded-md hover:bg-gray-600 transition-colors" onClick={() => setIsEdit(false)}>
+              <button
+                className="bg-gray-500 text-white px-3 py-2 rounded-md hover:bg-gray-600 transition-colors"
+                onClick={() => setIsEdit(false)}
+              >
                 Cancel
               </button>
-              <button className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-600 transition-colors" onClick={handleSave}>
+              <button
+                className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-600 transition-colors"
+                onClick={handleSave}
+              >
                 Save
               </button>
             </div>
@@ -137,7 +196,7 @@ const EditTraffic = ({traffic}) => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default EditTraffic
+export default EditTraffic;
