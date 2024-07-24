@@ -4,16 +4,14 @@ const createAdmin = async (req, res) => {
   try {
     const { email, name, password } = req.body;
     const adminExist = await prisma.user.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
     });
     if (adminExist) {
       return res
         .status(400)
         .json({ success: false, error: "Admin already exists" });
     }
-    const admin = await prisma.user.create({
+    await prisma.user.create({
       data: {
         email,
         password,
@@ -32,21 +30,19 @@ const createAdmin = async (req, res) => {
   }
 };
 
-//ambulance
+// Ambulance
 const createAmbulances = async (req, res) => {
   try {
     const { email, name, password, phoneNumber } = req.body;
     if (!email || !name || !password || !phoneNumber) {
-      return res.status(400).json({
-        success: false,
-        error: "Please provide email, name, password and phoneNumber",
-      });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          error: "Please provide email, name, password, and phoneNumber",
+        });
     }
-    const ambulanceExist = await prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
+    const ambulanceExist = await prisma.user.findUnique({ where: { email } });
     if (ambulanceExist) {
       return res
         .status(400)
@@ -59,18 +55,18 @@ const createAmbulances = async (req, res) => {
         password,
         role: "AMBULANCE",
         ambulanceProfile: {
-          create: {
-            phoneNumber,
-          },
+          create: { phoneNumber },
         },
       },
-      include: {
-        ambulanceProfile: true,
-      },
+      include: { ambulanceProfile: true },
     });
     return res
       .status(201)
-      .json({ success: true, message: "Ambulance created successfully" });
+      .json({
+        success: true,
+        message: "Ambulance created successfully",
+        data: user,
+      });
   } catch (error) {
     console.error(error);
     return res
@@ -82,56 +78,41 @@ const createAmbulances = async (req, res) => {
 const getAllAmbulance = async (req, res) => {
   try {
     const ambulances = await prisma.user.findMany({
-      where: {
-        role: "AMBULANCE",
-      },
+      where: { role: "AMBULANCE" },
       select: {
         id: true,
         email: true,
         name: true,
-        ambulanceProfile: {
-          select: {
-            phoneNumber: true,
-          },
-        },
+        ambulanceProfile: { select: { phoneNumber: true } },
       },
     });
-    return res.status(200).json({
-      success: true,
-      data: ambulances,
-    });
+    return res.status(200).json({ success: true, data: ambulances });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      success: false,
-      error: "Internal Server Error",
-    });
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal Server Error" });
   }
 };
+
 const updateAmbulance = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(id);
     const { email, name, password, phoneNumber } = req.body;
-    console.log(req.body);
 
     const ambulanceExist = await prisma.user.findUnique({
-      where: {
-        id: Number(id), // Ensure id is a number
-      },
+      where: { id: Number(id) },
+      include: { ambulanceProfile: true },
     });
 
     if (!ambulanceExist) {
-      return res.status(400).json({
-        success: false,
-        error: "Ambulance not found",
-      });
+      return res
+        .status(400)
+        .json({ success: false, error: "Ambulance not found" });
     }
 
     const user = await prisma.user.update({
-      where: {
-        id: Number(id),
-      },
+      where: { id: Number(id) },
       data: {
         email: email || ambulanceExist.email,
         name: name || ambulanceExist.name,
@@ -145,91 +126,76 @@ const updateAmbulance = async (req, res) => {
       },
     });
 
-    return res.status(200).json({
-      success: true,
-      message: "Ambulance updated successfully",
-      data: user,
-    });
+    return res
+      .status(200)
+      .json({
+        success: true,
+        message: "Ambulance updated successfully",
+        data: user,
+      });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      success: false,
-      error: "Internal Server Error",
-    });
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal Server Error" });
   }
 };
+
 const deleteAmbulance = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // First, delete the associated ambulance profile
-    await prisma.ambulanceProfile.deleteMany({
-      where: {
-        userId: Number(id),
-      },
-    });
+    await prisma.ambulanceProfile.deleteMany({ where: { userId: Number(id) } });
+    const user = await prisma.user.delete({ where: { id: Number(id) } });
 
-    // Then, delete the user
-    const user = await prisma.user.delete({
-      where: {
-        id: Number(id),
-      },
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: "Ambulance deleted successfully",
-      data: user,
-    });
+    return res
+      .status(200)
+      .json({
+        success: true,
+        message: "Ambulance deleted successfully",
+        data: user,
+      });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      success: false,
-      error: "Internal Server Error",
-    });
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal Server Error" });
   }
 };
 
-//hospital
-
+// Hospital
 const createHospital = async (req, res) => {
   try {
     const { email, name, password, phoneNumber, location } = req.body;
-    if (!email || !name || !password || !location || !phoneNumber) {
-      return res.status(400).json({
-        success: false,
-        error: "Please provide email, name, password and location",
-      });
+    if (!email || !name || !password || !phoneNumber || !location) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          error:
+            "Please provide email, name, password, location, and phoneNumber",
+        });
     }
-    const hospitalExist = await prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
+    const hospitalExist = await prisma.user.findUnique({ where: { email } });
     if (hospitalExist) {
       return res
         .status(400)
         .json({ success: false, error: "Hospital already exists" });
     }
-    const user = await prisma.user.create({
+    await prisma.user.create({
       data: {
         email,
         name,
         password,
-
         role: "HOSPITAL",
         hospitalProfile: {
-          create: {
-            phoneNumber,
-            location,
-          },
+          create: { phoneNumber, location },
         },
       },
     });
-    return res.status(201).json({
-      success: true,
-      message: "Hospital created successfully",
-    });
+    return res
+      .status(201)
+      .json({ success: true, message: "Hospital created successfully" });
   } catch (error) {
     console.error(error);
     return res
@@ -241,67 +207,49 @@ const createHospital = async (req, res) => {
 const getAllHospital = async (req, res) => {
   try {
     const hospitals = await prisma.user.findMany({
-      where: {
-        role: "HOSPITAL",
-      },
+      where: { role: "HOSPITAL" },
       select: {
         id: true,
         email: true,
         name: true,
         hospitalProfile: {
-          select: {
-            phoneNumber: true,
-            location: true,
-            status: true,
-          },
+          select: { phoneNumber: true, location: true, status: true },
         },
       },
     });
-    return res.status(200).json({
-      success: true,
-      data: hospitals,
-    });
+    return res.status(200).json({ success: true, data: hospitals });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      success: false,
-      error: "Internal Server Error",
-    });
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal Server Error" });
   }
 };
+
 const updateHospital = async (req, res) => {
   try {
     const { id } = req.params;
     const { email, name, password, phoneNumber, location, status } = req.body;
 
     const hospitalExist = await prisma.user.findUnique({
-      where: {
-        id: Number(id), // Ensure id is a number
-      },
-      include: {
-        hospitalProfile: true, // Include the hospitalProfile
-      },
+      where: { id: Number(id) },
+      include: { hospitalProfile: true },
     });
 
     if (!hospitalExist) {
-      return res.status(400).json({
-        success: false,
-        error: "Hospital not found",
-      });
+      return res
+        .status(400)
+        .json({ success: false, error: "Hospital not found" });
     }
 
-    // Check if hospitalProfile exists
     if (!hospitalExist.hospitalProfile) {
-      return res.status(400).json({
-        success: false,
-        error: "Hospital profile not found",
-      });
+      return res
+        .status(400)
+        .json({ success: false, error: "Hospital profile not found" });
     }
 
     const user = await prisma.user.update({
-      where: {
-        id: Number(id),
-      },
+      where: { id: Number(id) },
       data: {
         email: email || hospitalExist.email,
         name: name || hospitalExist.name,
@@ -320,90 +268,76 @@ const updateHospital = async (req, res) => {
       },
     });
 
-    return res.status(200).json({
-      success: true,
-      message: "Hospital updated successfully",
-      data: user,
-    });
+    return res
+      .status(200)
+      .json({
+        success: true,
+        message: "Hospital updated successfully",
+        data: user,
+      });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      success: false,
-      error: "Internal Server Error",
-    });
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal Server Error" });
   }
 };
+
 const deleteHospital = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // First, delete the associated ambulance profile
-    await prisma.hospitalProfile.deleteMany({
-      where: {
-        userId: Number(id),
-      },
-    });
+    await prisma.hospitalProfile.deleteMany({ where: { userId: Number(id) } });
+    const user = await prisma.user.delete({ where: { id: Number(id) } });
 
-    // Then, delete the user
-    const user = await prisma.user.delete({
-      where: {
-        id: Number(id),
-      },
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: "Hospital deleted successfully",
-      data: user,
-    });
+    return res
+      .status(200)
+      .json({
+        success: true,
+        message: "Hospital deleted successfully",
+        data: user,
+      });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      success: false,
-      error: "Internal Server Error",
-    });
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal Server Error" });
   }
 };
 
-//traffic conrtrollers
-
+// Traffic Controllers
 const createTraffic = async (req, res) => {
   try {
-    const { email, name, password, phoneNumber, location } = req.body;
-    if (!email || !name || !password || !location || !phoneNumber) {
-      return res.status(400).json({
-        success: false,
-        error: "Please provide email, name, password and location",
-      });
+    const { email, name, password, phoneNumber, location, area } = req.body;
+    if (!email || !name || !password || !phoneNumber || !location || !area) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          error:
+            "Please provide email, name, password, location, phoneNumber, and area",
+        });
     }
-    const trafficExist = await prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
+    const trafficExist = await prisma.user.findUnique({ where: { email } });
     if (trafficExist) {
       return res
         .status(400)
         .json({ success: false, error: "Traffic already exists" });
     }
-    const user = await prisma.user.create({
+    await prisma.user.create({
       data: {
         email,
         name,
         password,
         role: "TRAFFIC",
         trafficProfile: {
-          create: {
-            phoneNumber: phoneNumber,
-            location,
-          },
+          create: { phoneNumber, location, area },
         },
       },
     });
-    return res.status(201).json({
-      success: true,
-      message: "Traffic created successfully",
-    });
+    return res
+      .status(201)
+      .json({ success: true, message: "Traffic Signal created successfully" });
   } catch (error) {
     console.error(error);
     return res
@@ -415,9 +349,7 @@ const createTraffic = async (req, res) => {
 const getAllTraffic = async (req, res) => {
   try {
     const traffic = await prisma.user.findMany({
-      where: {
-        role: "TRAFFIC",
-      },
+      where: { role: "TRAFFIC" },
       select: {
         id: true,
         email: true,
@@ -427,55 +359,45 @@ const getAllTraffic = async (req, res) => {
             phoneNumber: true,
             location: true,
             status: true,
+            area: true,
           },
         },
       },
     });
-    return res.status(200).json({
-      success: true,
-      data: traffic,
-    });
+    return res.status(200).json({ success: true, data: traffic });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      success: false,
-      error: "Internal Server Error",
-    });
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal Server Error" });
   }
 };
+
 const updateTraffic = async (req, res) => {
   try {
     const { id } = req.params;
-    const { email, name, password, phoneNumber, location, status } = req.body;
+    const { email, name, password, phoneNumber, location, status, area } =
+      req.body;
 
     const trafficExist = await prisma.user.findUnique({
-      where: {
-        id: Number(id),
-      },
-      include: {
-        trafficProfile: true,
-      },
+      where: { id: Number(id) },
+      include: { trafficProfile: true },
     });
 
     if (!trafficExist) {
-      return res.status(400).json({
-        success: false,
-        error: "Traffic not found",
-      });
+      return res
+        .status(400)
+        .json({ success: false, error: "Traffic Signal not found" });
     }
 
-    // Check if hospitalProfile exists
     if (!trafficExist.trafficProfile) {
-      return res.status(400).json({
-        success: false,
-        error: "Hospital profile not found",
-      });
+      return res
+        .status(400)
+        .json({ success: false, error: "Traffic profile not found" });
     }
 
     const user = await prisma.user.update({
-      where: {
-        id: Number(id),
-      },
+      where: { id: Number(id) },
       data: {
         email: email || trafficExist.email,
         name: name || trafficExist.name,
@@ -484,6 +406,7 @@ const updateTraffic = async (req, res) => {
           update: {
             phoneNumber: phoneNumber || trafficExist.trafficProfile.phoneNumber,
             location: location || trafficExist.trafficProfile.location,
+            area: area || trafficExist.trafficProfile.area,
             status:
               typeof status === "boolean"
                 ? status
@@ -493,17 +416,18 @@ const updateTraffic = async (req, res) => {
       },
     });
 
-    return res.status(200).json({
-      success: true,
-      message: "Traffic updated successfully",
-      data: user,
-    });
+    return res
+      .status(200)
+      .json({
+        success: true,
+        message: "Traffic updated successfully",
+        data: user,
+      });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      success: false,
-      error: "Internal Server Error",
-    });
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal Server Error" });
   }
 };
 
@@ -511,31 +435,21 @@ const deleteTraffic = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // First, delete the associated ambulance profile
-    await prisma.trafficProfile.deleteMany({
-      where: {
-        userId: Number(id),
-      },
-    });
+    await prisma.trafficProfile.deleteMany({ where: { userId: Number(id) } });
+    const user = await prisma.user.delete({ where: { id: Number(id) } });
 
-    // Then, delete the user
-    const user = await prisma.user.delete({
-      where: {
-        id: Number(id),
-      },
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: "Traffic deleted successfully",
-      data: user,
-    });
+    return res
+      .status(200)
+      .json({
+        success: true,
+        message: "Traffic deleted successfully",
+        data: user,
+      });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      success: false,
-      error: "Internal Server Error",
-    });
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal Server Error" });
   }
 };
 
